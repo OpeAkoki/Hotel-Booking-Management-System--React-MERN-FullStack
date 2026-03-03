@@ -3,6 +3,19 @@ import request from "supertest";
 import cookieParser from "cookie-parser";
 import hotelRoutes from "../routes/hotels";
 import Hotel from "../models/hotel";
+import Stripe from "stripe";
+
+jest.mock("stripe", () => {
+  const mockCreate = jest.fn().mockResolvedValue({
+    id: "pi_xxx",
+    client_secret: "secret",
+  });
+  const Mock = jest.fn().mockImplementation(() => ({
+    paymentIntents: { create: mockCreate },
+  }));
+  (Mock as any).__mockCreate = mockCreate;
+  return Mock;
+});
 
 jest.mock("../middleware/auth", () => ({
   __esModule: true,
@@ -47,6 +60,14 @@ describe("Payment intent amount calculation", () => {
 
     expect(response.status).toBe(200);
     expect(response.body.totalCost).toBe(119 * 3);
+    expect((Stripe as any).__mockCreate).toHaveBeenCalledWith({
+      amount: 119 * 3 * 100,
+      currency: "gbp",
+      metadata: {
+        hotelId: "hotel-1",
+        userId: "user-123",
+      },
+    });
   });
 });
 
