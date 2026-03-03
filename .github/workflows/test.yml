@@ -1,4 +1,4 @@
-name: Backend Tests
+name: Backend Quality Gates
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 jobs:
-  backend-tests:
+  backend:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -26,5 +26,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run backend tests
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Run tests with coverage
         run: npm test
