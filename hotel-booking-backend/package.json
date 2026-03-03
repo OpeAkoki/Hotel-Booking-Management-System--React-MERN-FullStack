@@ -10,7 +10,7 @@
   "e2e": "cross-env DOTENV_CONFIG_PATH=.env.e2e nodemon",
   "lint": "tsc --noEmit",
   "typecheck": "tsc --noEmit",
-  "test": "jest --runInBand --coverage --coverageReporters=text-summary"
+  "test": "jest --runInBand --coverage --coverageReporters=text-summary --forceExit"
 },
   "author": "Arnob Mahmud",
   "license": "ISC",
