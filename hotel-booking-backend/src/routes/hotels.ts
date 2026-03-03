@@ -2,6 +2,7 @@ import express, { Request, Response } from "express";
 import Hotel from "../models/hotel";
 import Booking from "../models/booking";
 import User from "../models/user";
+import { hasOverlap } from "../utils/dateOverlap";
 import { BookingType, HotelSearchResponse } from "../../../shared/types";
 import { param, validationResult } from "express-validator";
 import Stripe from "stripe";
@@ -153,20 +154,34 @@ router.post(
         });
       }
 
+      const newCheckIn = new Date(req.body.checkIn);
+      const newCheckOut = new Date(req.body.checkOut);
+      const existingBookings = await Booking.find({
+        hotelId: req.params.hotelId,
+        status: { $in: ["confirmed", "pending"] },
+      });
+      const overlaps = existingBookings.some(
+        (b) =>
+          hasOverlap(newCheckIn, newCheckOut, b.checkIn, b.checkOut)
+      );
+      if (overlaps) {
+        return res.status(400).json({
+          message: "Booking dates overlap with an existing booking",
+        });
+      }
+
       const newBooking: BookingType = {
         ...req.body,
         userId: req.userId,
         hotelId: req.params.hotelId,
-        createdAt: new Date(), // Add booking creation timestamp
-        status: "confirmed", // Set initial status
-        paymentStatus: "paid", // Set payment status since payment succeeded
+        createdAt: new Date(),
+        status: "confirmed",
+        paymentStatus: "paid",
       };
 
-      // Create booking in separate collection
       const booking = new Booking(newBooking);
       await booking.save();
 
-      // Update hotel analytics
       await Hotel.findByIdAndUpdate(req.params.hotelId, {
         $inc: {
           totalBookings: 1,
@@ -174,7 +189,6 @@ router.post(
         },
       });
 
-      // Update user analytics
       await User.findByIdAndUpdate(req.userId, {
         $inc: {
           totalBookings: 1,
