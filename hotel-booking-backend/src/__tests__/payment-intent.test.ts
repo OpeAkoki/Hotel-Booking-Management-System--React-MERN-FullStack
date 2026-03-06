@@ -10,11 +10,17 @@ jest.mock("stripe", () => {
     id: "pi_xxx",
     client_secret: "secret",
   });
+
   const Mock = jest.fn().mockImplementation(() => ({
     paymentIntents: { create: mockCreate },
   }));
+
   (Mock as any).__mockCreate = mockCreate;
-  return Mock;
+
+  return {
+    __esModule: true,
+    default: Mock,
+  };
 });
 
 jest.mock("../middleware/auth", () => ({
