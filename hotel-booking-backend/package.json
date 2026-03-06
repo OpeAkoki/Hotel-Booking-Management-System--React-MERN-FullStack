@@ -10,7 +10,9 @@
   "e2e": "cross-env DOTENV_CONFIG_PATH=.env.e2e nodemon",
   "lint": "tsc --noEmit",
   "typecheck": "tsc --noEmit",
-  "test": "jest --runInBand --coverage --coverageReporters=text-summary --forceExit"
+  "test": "jest --runInBand --coverage --coverageReporters=text-summary --forceExit",
+  "test:unit": "jest --runInBand --forceExit --testPathPattern=\"dateOverlap|auth-middleware\"",
+  "test:integration": "jest --runInBand --forceExit --testPathPattern=\"payment-intent|booking-overlap|bookings-access|role-access\""
 },
   "author": "Arnob Mahmud",
   "license": "ISC",
