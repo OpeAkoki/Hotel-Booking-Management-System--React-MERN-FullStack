@@ -556,33 +556,33 @@ export const getAnalyticsDashboard = async (req: Request, res: Response) => {
 
 ---
 
-## 🧪 Testing
+## Testing
 
-### **API Testing**
-
-```bash
-# Test health endpoint (replace with your backend URL)
-curl https://your-backend-domain.com/api/health
-
-# Test authentication
-curl -X POST https://your-backend-domain.com/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"test@example.com","password":"password123"}'
-```
-
-### **Load Testing**
+The backend includes Jest-based unit and integration tests under `src/__tests__/`. Run them from the `hotel-booking-backend` directory:
 
 ```bash
-# Install artillery for load testing
-npm install -g artillery
+# Run full Jest test suite with coverage
+npm test
 
-# Run load test
-artillery quick --count 20 --num 10 https://your-backend-domain.com/api/health
+# Run only unit tests (for example date overlap and authentication middleware)
+npm run test:unit
+
+# Run only integration tests (for example bookings access and payment intent)
+npm run test:integration
 ```
+
+Current tests cover:
+
+- Booking date overlap detection
+- Authentication middleware behaviour for missing and valid tokens
+- Access control for routes such as `/api/my-bookings`, `/api/my-hotels`, and `/api/bookings/hotel/:hotelId`
+- Payment intent amount calculation for `/api/hotels/:hotelId/bookings/payment-intent`
+
+These tests also run in the "Backend Quality Gates" GitHub Actions workflow defined in `.github/workflows/test.yml`, alongside linting and TypeScript type checking.
 
 ---
 
-## 🔧 Development Commands
+## Development Commands
 
 ```bash
 # Development with hot reload
@@ -599,6 +599,15 @@ npm run type-check
 
 # Lint code
 npm run lint
+
+# Run full test suite with coverage
+npm test
+
+# Run only unit tests
+npm run test:unit
+
+# Run only integration tests
+npm run test:integration
 ```
 
 ---
